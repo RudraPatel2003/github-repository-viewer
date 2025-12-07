@@ -1,26 +1,45 @@
-using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Controls;
+using Flow.Launcher.Plugin.GitHubRepositoryViewer.Models;
+using Flow.Launcher.Plugin.GitHubRepositoryViewer.UI;
 
 namespace Flow.Launcher.Plugin.GitHubRepositoryViewer;
 
-public class GitHubRepositoryViewer : IPlugin
+public class GitHubRepositoryViewer : IAsyncPlugin, ISettingProvider
 {
+    private const string IconPath = "Assets/icon.png";
     private PluginInitContext? _context;
+    private Settings? _settings;
 
-    public void Init(PluginInitContext context)
+    public async Task InitAsync(PluginInitContext context)
     {
         _context = context;
+        _settings = context.API.LoadSettingJsonStorage<Settings>();
     }
 
-    public List<Result> Query(Query query)
+    public async Task<List<Result>> QueryAsync(Query query, CancellationToken token)
     {
         if (_context is null)
         {
-            return new List<Result>();
+            return await Task.FromResult(new List<Result>());
         }
 
-        Console.WriteLine(_context.API.FuzzySearch("Hello World", "Hello"));
+        Result result = new()
+        {
+            Title = "GitHub Repository Viewer",
+            SubTitle = _settings?.ApiToken ?? "No API Token",
+            IcoPath = IconPath,
+        };
 
-        return new List<Result>();
+        return await Task.FromResult(new List<Result>() { result });
+    }
+
+    public Control CreateSettingPanel()
+    {
+        SettingsViewModel settingsViewModel = new(_settings ?? new Settings());
+
+        return new SettingsView(settingsViewModel);
     }
 }
