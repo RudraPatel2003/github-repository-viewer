@@ -44,7 +44,6 @@
 
   <ItemGroup>
     <PackageReference Include="Flow.Launcher.Plugin" Version="4.4.0" />
-    <PackageReference Include="FuzzySharp" Version="2.0.2" />
     <PackageReference Include="Octokit" Version="14.0.0" />
   </ItemGroup>
 </Project>
