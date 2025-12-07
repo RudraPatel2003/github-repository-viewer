@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net7.0-windows</TargetFramework>
+
+    <!-- Metadata -->
+    <AssemblyName>Flow.Launcher.Plugin.GitHubRepositoryViewer</AssemblyName>
+    <PackageId>Flow.Launcher.Plugin.GitHubRepositoryViewer</PackageId>
+    <Authors>RudraPatel2003</Authors>
+    <PackageProjectUrl>https://github.com/RudraPatel2003/github-repository-viewer</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/RudraPatel2003/github-repository-viewer</RepositoryUrl>
+    <PackageTags>flow-launcher flow-plugin</PackageTags>
+
+    <!-- Default Configuration Included In Template -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- Additional Configuration -->
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+    <CSharpier_Check>true</CSharpier_Check>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>None</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="plugin.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Flow.Launcher.Plugin" Version="4.4.0" />
+  </ItemGroup>
+</Project>
