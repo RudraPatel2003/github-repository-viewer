@@ -6,7 +6,7 @@
     "Author": "RudraPatel2003",
     "Version": "1.0.0",
     "Language": "csharp",
-    "Website": "https://github.com/RudraPatel2003/Flow.Launcher.Plugin.GitHubRepositoryViewer",
+    "Website": "https://github.com/RudraPatel2003/github-repository-viewer",
     "IcoPath": "icon.png",
     "ExecuteFileName": "Flow.Launcher.Plugin.GitHubRepositoryViewer.dll"
 }
