@@ -12,7 +12,6 @@ public class GitHubAPI
     public bool IsLoadingRepositories { get; private set; }
     public bool ErroredOut { get; private set; }
     public List<Repository> Repositories { get; private set; } = new();
-
     private readonly PluginInitContext _context;
 
     public GitHubAPI(string token, PluginInitContext context)
@@ -49,8 +48,8 @@ public class GitHubAPI
             };
 
             List<Repository> repositories = new();
-
             int page = 1;
+
             while (true)
             {
                 ApiOptions options = new()

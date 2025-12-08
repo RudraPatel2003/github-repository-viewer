@@ -55,7 +55,7 @@ public class GitHubRepositoryViewer : IAsyncPlugin, ISettingProvider, IAsyncRelo
     {
         SettingsViewModel settingsViewModel = new(_settings ?? new Settings());
 
-        return new SettingsView(settingsViewModel);
+        return new SettingsView(_context!, settingsViewModel);
     }
 
     public Task ReloadDataAsync()
@@ -72,7 +72,7 @@ public class GitHubRepositoryViewer : IAsyncPlugin, ISettingProvider, IAsyncRelo
     {
         query = query.ToLowerInvariant().Trim();
 
-        if (_gitHubAPI is null)
+        if (_gitHubAPI is null || _settings is null)
         {
             return Task.FromResult(new List<Result>());
         }
@@ -83,16 +83,17 @@ public class GitHubRepositoryViewer : IAsyncPlugin, ISettingProvider, IAsyncRelo
         }
 
         List<Repository> repositories = _gitHubAPI.Repositories;
+        HashSet<string> excludedOwners = _settings.ExcludedOwners;
 
-        var scoredRepositories = repositories
-            .Select(repository => new
-            {
-                Repo = repository,
-                Score = FuzzyScore.Score(repository.FullName, query),
-            })
+        List<ScoredRepository> scoredRepositories = repositories
+            .Select(repository => new ScoredRepository(
+                repository,
+                FuzzyScore.Score(repository.FullName, query)
+            ))
             .Where(repository => repository.Score > 0)
+            .Where(repository => !excludedOwners.Contains(repository.Repository.Owner.Login))
             .OrderByDescending(repository => repository.Score)
-            .ThenByDescending(repository => repository.Repo.UpdatedAt)
+            .ThenByDescending(repository => repository.Repository.UpdatedAt)
             .ToList();
 
         if (scoredRepositories.Count == 0)
@@ -103,13 +104,13 @@ public class GitHubRepositoryViewer : IAsyncPlugin, ISettingProvider, IAsyncRelo
         List<Result> results = scoredRepositories
             .Select(repository => new Result
             {
-                Title = repository.Repo.FullName,
-                SubTitle = repository.Repo.Description,
+                Title = repository.Repository.FullName,
+                SubTitle = repository.Repository.Description,
                 IcoPath = Constants.IconPath,
                 Score = repository.Score,
                 Action = _ =>
                 {
-                    Actions.OpenUrl(repository.Repo.HtmlUrl);
+                    Actions.OpenUrl(repository.Repository.HtmlUrl);
                     return true;
                 },
             })
