@@ -2,6 +2,10 @@ namespace Flow.Launcher.Plugin.GitHubRepositoryViewer.Helpers;
 
 public static class FuzzyScore
 {
+    /**
+    * This is a port of the FuzzyScore algorithm that is a part of the Apache Commons project
+    * https://commons.apache.org/proper/commons-text/apidocs/org/apache/commons/text/similarity/FuzzyScore.html
+    */
     public static int Score(string term, string query)
     {
         term = term.ToLowerInvariant().Trim();

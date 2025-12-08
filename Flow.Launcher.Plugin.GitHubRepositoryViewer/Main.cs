@@ -11,45 +11,44 @@ using Octokit;
 
 namespace Flow.Launcher.Plugin.GitHubRepositoryViewer;
 
-public class GitHubRepositoryViewer : IAsyncPlugin, ISettingProvider
+public class GitHubRepositoryViewer : IAsyncPlugin, ISettingProvider, IAsyncReloadable
 {
-    private const string IconPath = "Assets/icon.png";
     private PluginInitContext? _context;
     private Settings? _settings;
     private GitHubAPI? _gitHubAPI;
 
-    public async Task InitAsync(PluginInitContext context)
+    public Task InitAsync(PluginInitContext context)
     {
         _context = context;
         _settings = context.API.LoadSettingJsonStorage<Settings>();
         _gitHubAPI = new GitHubAPI(_settings.ApiToken, context);
 
-        await _gitHubAPI.FetchRepositories();
+        return _gitHubAPI.FetchRepositories();
     }
 
-    public async Task<List<Result>> QueryAsync(Query query, CancellationToken token)
+    public Task<List<Result>> QueryAsync(Query query, CancellationToken token)
     {
         if (_context is null || _gitHubAPI is null)
         {
-            return await GetLoadingMessage();
+            return Messages.GetLoadingMessage();
         }
 
         if (!_gitHubAPI.HasToken)
         {
-            return await GetMissingTokenMessage();
+            return Messages.GetMissingTokenMessage(_context);
         }
 
         if (_gitHubAPI.IsLoadingRepositories)
         {
-            return await GetLoadingMessage();
+            return Messages.GetLoadingMessage();
         }
 
         if (_gitHubAPI.ErroredOut)
         {
-            return await GetErrorMessage();
+            return Messages.GetErrorMessage(_context);
         }
 
-        return await GetResults(query.Search);
+        return GetResults(query.Search);
     }
 
     public Control CreateSettingPanel()
@@ -59,69 +58,28 @@ public class GitHubRepositoryViewer : IAsyncPlugin, ISettingProvider
         return new SettingsView(settingsViewModel);
     }
 
-    private async Task<List<Result>> GetMissingTokenMessage()
+    public Task ReloadDataAsync()
     {
-        Result missingTokenResult = new()
+        if (_context is null)
         {
-            Title = "Missing API Token",
-            SubTitle = "Please provide a GitHub API token in the settings",
-            IcoPath = IconPath,
-            Action = (e) =>
-            {
-                _context?.API.OpenSettingDialog();
-                return true;
-            },
-        };
+            return Task.CompletedTask;
+        }
 
-        return await Task.FromResult(new List<Result>() { missingTokenResult });
+        return InitAsync(_context);
     }
 
-    private static Task<List<Result>> GetLoadingMessage()
+    private Task<List<Result>> GetResults(string query)
     {
-        Result loadingResult = new()
-        {
-            Title = "Fetching repositories...",
-            SubTitle = "Please wait...",
-            IcoPath = IconPath,
-        };
+        query = query.ToLowerInvariant().Trim();
 
-        return Task.FromResult(new List<Result>() { loadingResult });
-    }
-
-    private static Task<List<Result>> GetErrorMessage()
-    {
-        Result errorResult = new()
-        {
-            Title = "Error",
-            SubTitle = "An error occurred while fetching repositories",
-            IcoPath = IconPath,
-        };
-
-        return Task.FromResult(new List<Result>() { errorResult });
-    }
-
-    private static Task<List<Result>> GetKeepTypingMessage()
-    {
-        Result keepTypingResult = new()
-        {
-            Title = "Keep Typing",
-            SubTitle = "Please keep typing to search for a repository",
-            IcoPath = IconPath,
-        };
-
-        return Task.FromResult(new List<Result>() { keepTypingResult });
-    }
-
-    private async Task<List<Result>> GetResults(string query)
-    {
         if (_gitHubAPI is null)
         {
-            return await Task.FromResult(new List<Result>());
+            return Task.FromResult(new List<Result>());
         }
 
         if (string.IsNullOrWhiteSpace(query))
         {
-            return await GetKeepTypingMessage();
+            return Messages.GetKeepTypingMessage();
         }
 
         List<Repository> repositories = _gitHubAPI.Repositories;
@@ -132,17 +90,22 @@ public class GitHubRepositoryViewer : IAsyncPlugin, ISettingProvider
                 Repo = repository,
                 Score = FuzzyScore.Score(repository.FullName, query),
             })
-            .Where(x => x.Score > 0)
-            .OrderByDescending(x => x.Score)
+            .Where(repository => repository.Score > 0)
+            .OrderByDescending(repository => repository.Score)
+            .ThenByDescending(repository => repository.Repo.UpdatedAt)
             .ToList();
+
+        if (scoredRepositories.Count == 0)
+        {
+            return Messages.GetNoResultsMessage(_context);
+        }
 
         List<Result> results = scoredRepositories
             .Select(repository => new Result
             {
                 Title = repository.Repo.FullName,
-                SubTitle =
-                    $"{repository.Repo.Description ?? "No description"}  —  Score: {repository.Score}",
-                IcoPath = IconPath,
+                SubTitle = repository.Repo.Description,
+                IcoPath = Constants.IconPath,
                 Score = repository.Score,
                 Action = _ =>
                 {
@@ -152,6 +115,6 @@ public class GitHubRepositoryViewer : IAsyncPlugin, ISettingProvider
             })
             .ToList();
 
-        return await Task.FromResult(results);
+        return Task.FromResult(results);
     }
 }
