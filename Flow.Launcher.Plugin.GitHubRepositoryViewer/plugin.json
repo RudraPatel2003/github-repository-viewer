@@ -1,4 +1,5 @@
 {
+    "$schema": "https://www.flowlauncher.com/schemas/plugin.schema.json",
     "ID": "162D050FCC554C78B4AAD612C910E63D",
     "ActionKeyword": "gh",
     "Name": "GitHub Repository Viewer",
