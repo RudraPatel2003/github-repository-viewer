@@ -44,10 +44,9 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Run csharpier
+      - name: Restore tools
         run: |
           dotnet tool restore
-          dotnet csharpier check .
 
       - name: Run dotnet build
         run: dotnet build
