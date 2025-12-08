@@ -7,6 +7,9 @@ on:
       - .github/workflows/*
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   publish:
     runs-on: windows-latest
