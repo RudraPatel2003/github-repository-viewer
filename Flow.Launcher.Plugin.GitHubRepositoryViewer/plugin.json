@@ -1,0 +1,13 @@
+{
+    "$schema": "https://www.flowlauncher.com/schemas/plugin.schema.json",
+    "ID": "162D050FCC554C78B4AAD612C910E63D",
+    "ActionKeyword": "gh",
+    "Name": "GitHub Repository Viewer",
+    "Description": "A Flow Launcher plugin to quickly navigate to your personal repositories",
+    "Author": "RudraPatel2003",
+    "Version": "1.0.0",
+    "Language": "csharp",
+    "Website": "https://github.com/RudraPatel2003/github-repository-viewer",
+    "IcoPath": "Assets/icon.png",
+    "ExecuteFileName": "Flow.Launcher.Plugin.GitHubRepositoryViewer.dll"
+}

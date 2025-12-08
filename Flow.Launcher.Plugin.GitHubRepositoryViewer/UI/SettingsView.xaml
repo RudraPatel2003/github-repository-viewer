@@ -1,0 +1,83 @@
+<UserControl
+  x:Class="Flow.Launcher.Plugin.GitHubRepositoryViewer.UI.SettingsView"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="http://schemas.modernwpf.com/2019"
+  xmlns:vm="clr-namespace:Flow.Launcher.Plugin.GitHubRepositoryViewer.UI"
+  d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}"
+  d:DesignHeight="350"
+  d:DesignWidth="450"
+  mc:Ignorable="d"
+>
+  <Border CornerRadius="0,0,9,9" Style="{DynamicResource SettingGroupBox}">
+    <Grid Margin="0,10,0,10">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="20" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <Grid Grid.Row="0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" SharedSizeGroup="A" />
+          <ColumnDefinition Width="*" SharedSizeGroup="B" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock
+          Grid.Column="0"
+          Margin="16,6,16,6"
+          VerticalAlignment="Center"
+          Text="GitHub API Token"
+          TextBlock.Foreground="{DynamicResource Color05B}"
+        />
+
+        <TextBox
+          Grid.Column="1"
+          Width="300"
+          VerticalAlignment="Center"
+          Text="{Binding ApiToken}"
+          TextWrapping="NoWrap"
+        />
+      </Grid>
+
+      <Grid Grid.Row="2">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ListView
+          x:Name="ExcludedOwnersList"
+          Grid.Row="0"
+          Margin="16,0,16,10"
+          BorderBrush="DarkGray"
+          BorderThickness="1"
+          ItemsSource="{Binding ExcludedOwnersCollection}"
+          SelectionMode="Extended"
+        >
+          <ListView.View>
+            <GridView>
+              <GridViewColumn Header="Excluded Owners" Width="Auto" />
+            </GridView>
+          </ListView.View>
+        </ListView>
+
+        <DockPanel Grid.Row="1" Margin="14,0,14,10">
+          <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+            <Button MinWidth="100" Margin="10" Click="ButtonAdd_Click" Content="Add" />
+            <Button
+              MinWidth="100"
+              Margin="10,10,0,10"
+              Click="ButtonDelete_Click"
+              Content="Delete"
+            />
+          </StackPanel>
+
+          <TextBox x:Name="ExcludedOwnerInput" Margin="0,10,10,10" />
+        </DockPanel>
+      </Grid>
+    </Grid>
+  </Border>
+</UserControl>
