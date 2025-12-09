@@ -7,6 +7,7 @@ using Flow.Launcher.Plugin.GitHubRepositoryViewer.API;
 using Flow.Launcher.Plugin.GitHubRepositoryViewer.Helpers;
 using Flow.Launcher.Plugin.GitHubRepositoryViewer.Models;
 using Flow.Launcher.Plugin.GitHubRepositoryViewer.UI;
+using FuzzyScore.Net;
 using Octokit;
 
 namespace Flow.Launcher.Plugin.GitHubRepositoryViewer;
@@ -88,7 +89,7 @@ public class GitHubRepositoryViewer : IAsyncPlugin, ISettingProvider, IAsyncRelo
         List<ScoredRepository> scoredRepositories = repositories
             .Select(repository => new ScoredRepository(
                 repository,
-                FuzzyScore.Score(repository.FullName, query)
+                FuzzyScorer.Score(repository.FullName, query)
             ))
             .Where(repository => repository.Score > 0)
             .Where(repository => !excludedOwners.Contains(repository.Repository.Owner.Login))
