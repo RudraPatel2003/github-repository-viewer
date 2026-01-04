@@ -11,6 +11,7 @@ public static class Messages
         {
             Title = "Missing API Token",
             SubTitle = "Please provide a GitHub API token in the settings",
+            Score = 100,
             IcoPath = Constants.IconPath,
             Action = (e) =>
             {
@@ -42,6 +43,7 @@ public static class Messages
         {
             Title = "Error",
             SubTitle = "An error occurred while fetching repositories",
+            Score = 100,
             IcoPath = Constants.IconPath,
         };
 
@@ -50,24 +52,13 @@ public static class Messages
         return Task.FromResult(new List<Result>() { errorResult, reloadPluginResult });
     }
 
-    public static Task<List<Result>> GetKeepTypingMessage()
-    {
-        Result keepTypingResult = new()
-        {
-            Title = "Keep Typing",
-            SubTitle = "Please keep typing to search for a repository",
-            IcoPath = Constants.IconPath,
-        };
-
-        return Task.FromResult(new List<Result>() { keepTypingResult });
-    }
-
     public static Task<List<Result>> GetNoResultsMessage(PluginInitContext? context)
     {
         Result noResultsResult = new()
         {
             Title = "No results",
             SubTitle = "No results found",
+            Score = 100,
             IcoPath = Constants.IconPath,
         };
 
@@ -82,6 +73,7 @@ public static class Messages
         {
             Title = "Reload plugin",
             SubTitle = "Reload plugin",
+            Score = 1,
             IcoPath = Constants.IconPath,
             Action = (e) =>
             {

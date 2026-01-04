@@ -18,6 +18,16 @@ public class SettingsViewModel : BaseModel
         }
     }
 
+    public bool SearchByRepositoryFullName
+    {
+        get => Settings.SearchByRepositoryFullName;
+        set
+        {
+            Settings.SearchByRepositoryFullName = value;
+            OnPropertyChanged();
+        }
+    }
+
     public ObservableCollection<string> ExcludedOwnersCollection { get; }
 
     public SettingsViewModel(Settings settings)

@@ -78,20 +78,26 @@ public class GitHubRepositoryViewer : IAsyncPlugin, ISettingProvider, IAsyncRelo
             return Task.FromResult(new List<Result>());
         }
 
-        if (string.IsNullOrWhiteSpace(query))
-        {
-            return Messages.GetKeepTypingMessage();
-        }
-
         List<Repository> repositories = _gitHubAPI.Repositories;
         HashSet<string> excludedOwners = _settings.ExcludedOwners;
 
-        List<ScoredRepository> scoredRepositories = repositories
-            .Select(repository => new ScoredRepository(
-                repository,
-                FuzzyScorer.Score(repository.FullName, query)
-            ))
-            .Where(repository => repository.Score > 0)
+        IEnumerable<ScoredRepository> scoredRepositoriesQuery = repositories.Select(repository =>
+        {
+            string filterField = _settings.SearchByRepositoryFullName
+                ? repository.FullName
+                : repository.Name;
+
+            return new ScoredRepository(repository, FuzzyScorer.Score(filterField, query));
+        });
+
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            scoredRepositoriesQuery = scoredRepositoriesQuery.Where(repository =>
+                repository.Score > 0
+            );
+        }
+
+        List<ScoredRepository> scoredRepositories = scoredRepositoriesQuery
             .Where(repository => !excludedOwners.Contains(repository.Repository.Owner.Login))
             .OrderByDescending(repository => repository.Score)
             .ThenByDescending(repository => repository.Repository.UpdatedAt)
